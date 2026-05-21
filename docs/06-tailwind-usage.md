@@ -4,7 +4,7 @@ title: Tailwind CSS Usage
 
 # Tailwind CSS Usage
 
-The docs package uses [Spatie Laravel PDF](https://spatie.be/docs/laravel-pdf/v1/introduction) which supports Tailwind CSS for styling templates.
+The docs package uses Spatie Laravel PDF and Browsershot, so standard Tailwind-friendly Blade templates work well for generated PDFs.
 
 ## Basic Setup
 
@@ -93,9 +93,9 @@ module.exports = {
 
 ```blade
 <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
-  @if(\Commerce\Docs\States\DocStatus::normalize($doc->status) === 'paid') bg-green-100 text-green-800
-  @elseif(\Commerce\Docs\States\DocStatus::normalize($doc->status) === 'pending') bg-yellow-100 text-yellow-800
-  @elseif(\Commerce\Docs\States\DocStatus::normalize($doc->status) === 'overdue') bg-red-100 text-red-800
+  @if(\AIArmada\Docs\States\DocStatus::normalize($doc->status) === 'paid') bg-green-100 text-green-800
+  @elseif(\AIArmada\Docs\States\DocStatus::normalize($doc->status) === 'pending') bg-yellow-100 text-yellow-800
+  @elseif(\AIArmada\Docs\States\DocStatus::normalize($doc->status) === 'overdue') bg-red-100 text-red-800
     @else bg-gray-100 text-gray-800
     @endif">
     {{ $doc->status->label() }}
@@ -141,8 +141,8 @@ module.exports = {
    <div class="page-break-after:always"></div>
    ```
 
-## References
+## Practical advice
 
-- [Spatie Laravel PDF Documentation](https://spatie.be/docs/laravel-pdf/v1/introduction)
-- [Using Tailwind with Spatie Laravel PDF](https://spatie.be/docs/laravel-pdf/v1/advanced-usage/using-tailwind)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- Keep layouts simple and print-friendly.
+- Prefer explicit spacing and fixed widths for predictable PDF output.
+- If you build a dedicated CSS file, make sure the generated path is readable by the PDF process.

@@ -2,15 +2,15 @@
 title: Installation
 ---
 
+import Aside from "@components/Aside.astro"
+
 # Installation
 
 ## Requirements
 
 - PHP 8.4+
 - Laravel 12.0+
-- Spatie Laravel PDF 1.5+
-- Node.js 18+ and npm
-- Puppeteer (for PDF generation)
+- A working Browsershot / Chromium environment for PDF generation
 
 ## Install via Composer
 
@@ -38,13 +38,9 @@ php artisan vendor:publish --tag=docs-views
 php artisan migrate
 ```
 
-## Install PDF Dependencies
+## PDF Runtime
 
-Puppeteer is required for PDF generation:
-
-```bash
-npm install puppeteer
-```
+`aiarmada/docs` uses Spatie Laravel PDF and Browsershot under the hood. Make sure your deployment environment has the browser/runtime support required by Browsershot for PDF generation.
 
 ## Environment Configuration
 
@@ -72,6 +68,23 @@ DOCS_CURRENCY=MYR
 DOCS_TAX_RATE=0.06
 DOCS_DUE_DAYS=30
 
-# PDF Generation
-DOCS_GENERATE_PDF=true
+```
+
+
+## Multi-Tenant Setup
+
+<Aside variant="warning">
+  Owner scoping is **disabled by default** (`DOCS_OWNER_ENABLED=false`). In a multi-tenant deployment every tenant will see all invoices and documents unless you enable it. Set `DOCS_OWNER_ENABLED=true` and bind `OwnerResolverInterface` before going live.
+</Aside>
+
+```env
+DOCS_OWNER_ENABLED=true
+```
+
+Bind the resolver in `AppServiceProvider::register()`:
+
+```php
+use AIArmada\CommerceSupport\Contracts\OwnerResolverInterface;
+
+$this->app->bind(OwnerResolverInterface::class, CurrentTenantResolver::class);
 ```

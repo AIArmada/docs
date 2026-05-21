@@ -42,7 +42,11 @@ final class SequenceManager
      */
     public function getActiveSequence(string $docType, ?Model $owner = null): ?DocSequence
     {
-        $query = DocSequence::query()
+        // Bypass the global OwnerScope so that explicit owner/null handling below
+        // is not ANDed with the ambient tenant filter — which would produce a
+        // contradictory WHERE clause when looking up global (owner = null) sequences
+        // from within a tenant request context.
+        $query = DocSequence::withoutOwnerScope()
             ->where('doc_type', $docType)
             ->where('is_active', true);
 
@@ -50,7 +54,7 @@ final class SequenceManager
             $query->where('owner_type', $owner->getMorphClass())
                 ->where('owner_id', $owner->getKey());
         } else {
-            $query->whereNull('owner_type');
+            $query->whereNull('owner_type')->whereNull('owner_id');
         }
 
         return $query->first();

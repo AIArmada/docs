@@ -109,7 +109,7 @@ DocTemplate::create([
 ### 3. Use the Template
 
 ```php
-$document = $docService->createDoc(DocData::from([
+$document = $docService->create(DocData::from([
     'template_slug' => 'modern',
     'doc_type' => 'invoice',
     // ... other data
@@ -121,7 +121,7 @@ $document = $docService->createDoc(DocData::from([
 ```php
 $doc->doc_number          // Document number
 $doc->doc_type            // Type (invoice, receipt)
-$doc->status              // DocStatus enum
+$doc->status              // State-cast status object (AIArmada\Docs\States\DocStatus)
 $doc->issue_date          // Carbon instance
 $doc->due_date            // Carbon instance (nullable)
 $doc->subtotal            // Subtotal amount
@@ -153,4 +153,4 @@ The recommended approach uses Tailwind CDN:
 <script src="https://cdn.tailwindcss.com"></script>
 ```
 
-For production, consider building a dedicated CSS file. See [Tailwind Usage Guide](./05-tailwind-usage.md).
+For production, consider building a dedicated CSS file. See [Tailwind Usage Guide](./06-tailwind-usage.md).

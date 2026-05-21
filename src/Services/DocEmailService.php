@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AIArmada\Docs\Services;
 
+use AIArmada\CommerceSupport\Support\MoneyFormatter;
 use AIArmada\Docs\Enums\EmailStatus;
 use AIArmada\Docs\Mail\DocMail;
 use AIArmada\Docs\Models\Doc;
@@ -31,6 +32,9 @@ final class DocEmailService
         ?string $recipientName = null,
         ?DocEmailTemplate $template = null,
         array $variables = [],
+        ?string $subjectOverride = null,
+        ?string $bodyOverride = null,
+        array $metadata = [],
     ): DocEmail {
         // Find template if not provided
         $template ??= $this->findTemplate($doc, 'send');
@@ -39,9 +43,11 @@ final class DocEmailService
         $templateVars = $this->buildVariables($doc, $variables);
 
         // Render subject and body
-        $subject = $template?->renderSubject($templateVars)
+        $subject = $subjectOverride
+            ?? $template?->renderSubject($templateVars)
             ?? $this->getDefaultSubject($doc);
-        $body = $template?->renderBody($templateVars)
+        $body = $bodyOverride
+            ?? $template?->renderBody($templateVars)
             ?? $this->getDefaultBody($doc);
 
         $ownerAttributes = [];
@@ -60,6 +66,7 @@ final class DocEmailService
             'subject' => $subject,
             'body' => $body,
             'status' => EmailStatus::Queued,
+            'metadata' => $metadata,
         ], $ownerAttributes));
 
         // Queue the email
@@ -155,7 +162,7 @@ final class DocEmailService
         $email = DocEmail::query()
             ->when(
                 config('docs.owner.enabled', false),
-                fn (\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder => $query->withoutOwnerScope(),
+                fn (Builder $query): Builder => $query->withoutOwnerScope(),
             )
             ->find($data['email_id']);
         $email?->markAsOpened();
@@ -177,7 +184,7 @@ final class DocEmailService
         $email = DocEmail::query()
             ->when(
                 config('docs.owner.enabled', false),
-                fn (\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder => $query->withoutOwnerScope(),
+                fn (Builder $query): Builder => $query->withoutOwnerScope(),
             )
             ->find($data['email_id']);
         $email?->markAsClicked();
@@ -198,7 +205,8 @@ final class DocEmailService
             'doc_type' => $doc->doc_type,
             'issue_date' => $doc->issue_date->format('d/m/Y'),
             'due_date' => $doc->due_date?->format('d/m/Y') ?? '-',
-            'total' => number_format((float) $doc->total, 2),
+            'total' => MoneyFormatter::decimalFromMajor((float) $doc->total, $doc->currency),
+            'total_formatted' => MoneyFormatter::formatMajor((float) $doc->total, $doc->currency),
             'currency' => $doc->currency,
             'company_name' => $doc->company_data['name'] ?? config('docs.company.name'),
             'customer_name' => $doc->customer_data['name'] ?? 'Valued Customer',
@@ -222,8 +230,9 @@ final class DocEmailService
     {
         $type = ucfirst(str_replace('_', ' ', $doc->doc_type));
         $company = $doc->company_data['name'] ?? config('docs.company.name');
+        $formattedTotal = MoneyFormatter::formatMajor((float) $doc->total, $doc->currency);
 
-        return "Dear Customer,\n\nPlease find attached {$type} #{$doc->doc_number}.\n\nTotal: {$doc->currency} " . number_format((float) $doc->total, 2) . "\n\nThank you for your business.\n\n{$company}";
+        return "Dear Customer,\n\nPlease find attached {$type} #{$doc->doc_number}.\n\nTotal: {$formattedTotal}\n\nThank you for your business.\n\n{$company}";
     }
 
     /**
