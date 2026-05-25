@@ -4,6 +4,8 @@ title: PDF Generation
 
 # PDF Generation
 
+Use this page when you need rendering, storage, or download behavior rather than general document creation.
+
 ## Generating PDFs
 
 ```php

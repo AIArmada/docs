@@ -4,6 +4,8 @@ title: Document Status
 
 # Document Status
 
+This page covers state transitions and history once a document already exists.
+
 ## Common model helpers
 
 ```php

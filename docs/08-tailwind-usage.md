@@ -4,6 +4,8 @@ title: Tailwind CSS Usage
 
 # Tailwind CSS Usage
 
+This page focuses on template styling concerns after your base docs flow is already working.
+
 The docs package uses Spatie Laravel PDF and Browsershot, so standard Tailwind-friendly Blade templates work well for generated PDFs.
 
 ## Basic Setup

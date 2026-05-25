@@ -153,4 +153,4 @@ The recommended approach uses Tailwind CDN:
 <script src="https://cdn.tailwindcss.com"></script>
 ```
 
-For production, consider building a dedicated CSS file. See [Tailwind Usage Guide](./06-tailwind-usage.md).
+For production, consider building a dedicated CSS file. See [Tailwind Usage Guide](./08-tailwind-usage.md).
