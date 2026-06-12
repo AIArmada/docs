@@ -21,6 +21,7 @@ return new class extends Migration
             Schema::create($paymentsTable, function (Blueprint $table) use ($paymentsTable, $jsonType): void {
                 $table->uuid('id')->primary();
                 $table->nullableUuidMorphs('owner');
+                $table->string('status', 50)->default('paid');
                 $table->foreignUuid('doc_id');
                 $table->decimal('amount', 15, 2);
                 $table->string('currency', 3)->default('MYR');
@@ -28,6 +29,7 @@ return new class extends Migration
                 $table->string('reference')->nullable();
                 $table->string('transaction_id')->nullable();
                 $table->timestampTz('paid_at');
+                $table->timestampTz('refunded_at')->nullable();
                 $table->text('notes')->nullable();
                 $table->{$jsonType}('metadata')->nullable();
                 $table->timestampsTz();
@@ -71,6 +73,8 @@ return new class extends Migration
                 $table->text('body');
                 $table->string('status')->default('queued'); // queued, sent, failed, bounced
                 $table->timestampTz('sent_at')->nullable();
+                $table->timestampTz('delivered_at')->nullable();
+                $table->timestampTz('failed_at')->nullable();
                 $table->timestampTz('opened_at')->nullable();
                 $table->timestampTz('clicked_at')->nullable();
                 $table->unsignedInteger('open_count')->default(0);
@@ -96,7 +100,7 @@ return new class extends Migration
                 $table->{$jsonType}('snapshot');
                 $table->text('change_summary')->nullable();
                 $table->string('changed_by')->nullable();
-                $table->timestampsTz();
+                $table->timestampTz('created_at');
 
                 $table->unique(
                     ['doc_id', 'version_number'],
@@ -119,6 +123,7 @@ return new class extends Migration
                 $table->text('comments')->nullable();
                 $table->timestampTz('approved_at')->nullable();
                 $table->timestampTz('rejected_at')->nullable();
+                $table->timestampTz('expired_at')->nullable();
                 $table->timestampTz('expires_at')->nullable();
                 $table->timestampsTz();
 
@@ -146,6 +151,8 @@ return new class extends Migration
                 $table->string('qr_code_url')->nullable();
                 $table->timestampTz('submitted_at')->nullable();
                 $table->timestampTz('validated_at')->nullable();
+                $table->timestampTz('completed_at')->nullable();
+                $table->timestampTz('failed_at')->nullable();
                 $table->timestampsTz();
 
                 $table->index('doc_id', $einvoiceTable . '_doc_id_index');
