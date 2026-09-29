@@ -13,8 +13,7 @@ $docService = app(DocService::class);
 
 // Generate and save to disk
 $pdfPath = $docService->generatePdf($document, save: true);
-// Returns the disk-relative path, e.g. "docs/INV-2501-000001.pdf"
-// (path prefix comes from docs.storage.path or docs.types.{type}.storage.path)
+// Returns: "docs/invoices/inv25-abc123.pdf"
 
 // Generate without saving (returns PDF content)
 $pdfContent = $docService->generatePdf($document, save: false);
@@ -104,10 +103,9 @@ You can override storage per document type under `docs.types.{type}.storage`:
 Access stored PDFs:
 
 ```php
-use AIArmada\Docs\Services\DocService;
 use Illuminate\Support\Facades\Storage;
 
-$disk = app(DocService::class)->resolveStorageDiskForDocType($document->doc_type);
+$disk = config('docs.storage.disk');
 $path = $document->pdf_path;
 
 // Get URL (if disk supports it)
@@ -116,6 +114,3 @@ $url = Storage::disk($disk)->url($path);
 // Download
 return Storage::disk($disk)->download($path);
 ```
-
-> **warning**
-> `config('docs.storage.disk')` is only the fallback. Reading the disk straight from config skips any `docs.types.{type}.storage.disk` override, so a per-type disk would be bypassed.
